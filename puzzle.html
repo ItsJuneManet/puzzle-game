@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Puzzle Game</title>
+  <style>
+    body {
+      background: #1c1c1e;
+      color: #f5f5f7;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .puzzle-box {
+      max-width: 600px;
+      width: 100%;
+      background: #2c2c2e;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      margin-bottom: 1rem;
+    }
+    h2 {
+      margin-top: 0;
+      color: #ff79c6;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      margin-top: 1rem;
+    }
+    button {
+      background: #ff79c6;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+    .hidden-clue {
+      color: #2c2c2e;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="puzzle-box" id="game-box">
+    <h2>Access Required</h2>
+    <p>Enter the password to begin your puzzle journey.</p>
+    <p><em>Hint: The word is small, flies, and reminds you of change.</em></p>
+    <input type="text" id="accessCode" placeholder="Enter password...">
+    <button onclick="checkAccess()">Unlock</button>
+  </div>
+
+  <audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+
+  <script>
+    let currentLevel = 0;
+
+    const accessPassword = "butterfly";
+
+    const levels = [
+      {
+        question: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?",
+        answer: "echo"
+      },
+      {
+        question: "What comes next in the sequence: 2, 3, 5, 9, 17, ?",
+        answer: "33"
+      },
+      {
+        question: `There is a hidden clue on this page... Can you find it?<br><span class='hidden-clue'>butterfly</span>`,
+        answer: "butterfly"
+      },
+      {
+        question: "What were we eating when we watched B99 as a couple first?",
+        answer: "Fried Chicken"
+      }
+    ];
+
+    function playSound(type) {
+      const sound = document.getElementById(type === 'correct' ? 'correctSound' : 'wrongSound');
+      sound.play();
+    }
+
+    function checkAccess() {
+      const input = document.getElementById("accessCode").value.trim().toLowerCase();
+      if (input === accessPassword) {
+        playSound('correct');
+        startGame();
+      } else {
+        playSound('wrong');
+        alert("That's not the password. Try again.");
+      }
+    }
+
+    function startGame() {
+      currentLevel = 0;
+      showLevel();
+    }
+
+    function showLevel() {
+      const gameBox = document.getElementById("game-box");
+      if (currentLevel >= levels.length) {
+        showFinalMessage();
+        return;
+      }
+
+      const level = levels[currentLevel];
+      gameBox.innerHTML = `
+        <h2>Level ${currentLevel + 1}</h2>
+        <p>${level.question}</p>
+        <input type="text" id="answerInput" placeholder="Type your answer..." />
+        <button onclick="checkAnswer()">Submit</button>
+      `;
+    }
+
+    function checkAnswer() {
+      const input = document.getElementById("answerInput").value.trim().toLowerCase();
+      const correct = levels[currentLevel].answer.toLowerCase();
+      if (input === correct) {
+        playSound('correct');
+        currentLevel++;
+        setTimeout(showLevel, 600);
+      } else {
+        playSound('wrong');
+        alert("That's not it! Try again.");
+      }
+    }
+
+    function showFinalMessage() {
+      const gameBox = document.getElementById("game-box");
+      gameBox.innerHTML = `
+        <h2>Congratulations!</h2>
+        <p>There’s no escaping this: You’re my favorite puzzle. And I’ll keep solving you, forever.</p>
+        <p>Love, Juhi</p>
+      `;
+    }
+  </script>
+</body>
+</html>
